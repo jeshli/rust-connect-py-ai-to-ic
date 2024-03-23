@@ -30,7 +30,7 @@ fn main() -> Result<(), String> {
     let model_files: Vec<&str> = model_files_input.split(',').collect();
 
     //println!("Hello, world!");
-    simple_dfx_execute(canister_name, "initialize_model_pipeline");
+    //simple_dfx_execute(canister_name, "initialize_model_pipeline");
 
 
     for model_file in model_files {

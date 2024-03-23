@@ -29,7 +29,8 @@ type Tensor = tract_data::tensor::Tensor;
 thread_local! {
     static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
     static MODEL_READ_REF_CELL: RefCell<Option<SimplePlanTypeRead>> = RefCell::new(None);
-    static MODEL_PIPELINE: RefCell<Option<ModelPipeline>> = RefCell::new(None);
+    //static MODEL_PIPELINE: RefCell<Option<ModelPipeline>> = RefCell::new(None);
+    static MODEL: RefCell<Option<SimplePlanTypeRun>> = RefCell::new(None);
     //static MODEL_PIPELINE: RefCell<Option<Vec<SimplePlanTypeRun>>> = RefCell::new(None);
 
 }
@@ -78,6 +79,7 @@ impl ModelPipeline {
 
 }
 
+/*
 #[ic_cdk::update]
 fn initialize_model_pipeline() {
     MODEL_PIPELINE.with(|pipeline_ref| {
@@ -85,6 +87,7 @@ fn initialize_model_pipeline() {
         *pipeline = Some(ModelPipeline::new()); // Assuming ModelPipeline has a new() method
     });
 }
+
 
 fn add_model_to_pipeline(model: SimplePlanTypeRun) {
     MODEL_PIPELINE.with(|pipeline_ref| {
@@ -94,7 +97,7 @@ fn add_model_to_pipeline(model: SimplePlanTypeRun) {
         }
     });
 }
-
+*/
 
 
 /*
@@ -149,14 +152,20 @@ fn plan_to_running_model() {
                 .into_runnable()
                 .expect("Couldn't Make Runnable");
 
-            // now want to do this
-            add_model_to_pipeline(run_model);
+            set_model(run_model);
+
 
 
         }
     })
+
 }
 
+fn set_model(model: SimplePlanTypeRun) {
+    MODEL.with(|model_ref_cell| {
+        *model_ref_cell.borrow_mut() = Some(model);
+    });
+}
 
 
 /*
@@ -211,7 +220,8 @@ fn run_model_and_get_result_chain(token_ids: Vec<i64>) -> Result<Vec<f32>, Strin
     };
 
     // Use a match statement to handle the Result from run_model
-    match run_model(0_u8, input_tensor) {
+    //match run_model(0_u8, input_tensor) {
+    match run_model(input_tensor) {
         Ok((out, _result_shape)) => Ok(out),
         Err(e) => {
             // Print the error and possibly return or handle it
@@ -223,6 +233,7 @@ fn run_model_and_get_result_chain(token_ids: Vec<i64>) -> Result<Vec<f32>, Strin
 
 }
 
+/*
 fn run_model(index: u8, input: Tensor) -> Result<(Vec<f32>, Vec<usize>), String> {
     MODEL_PIPELINE.with(|pipeline_ref| {
         let pipeline = pipeline_ref.borrow();
@@ -237,7 +248,47 @@ fn run_model(index: u8, input: Tensor) -> Result<(Vec<f32>, Vec<usize>), String>
         }
     })
 }
+*/
 
 
 
 
+fn run_model(input: Tensor) -> Result<(Vec<f32>, Vec<usize>), String> {
+    MODEL.with(|model_ref| {
+        if let Some(model) = &*model_ref.borrow() {
+            model.run(tvec!(input.into()))
+                .map_err(|e| e.to_string())
+                .and_then(|result| {
+                    result.first().map_or(
+                        Err("No Data in Result".to_string()),
+                        |first_tensor| {
+                            let shape = first_tensor.shape().to_vec();
+                            // Here, ensure we're correctly constructing the tuple as expected
+                            first_tensor.to_array_view::<f32>()
+                                .map(|values| (values.as_slice().unwrap_or(&[]).to_vec(), shape))
+                                // No need to map to values alone, return the tuple as is
+                                .map_err(|_| "Failed to convert tensor to array view".to_string())
+                        }
+                    )
+                })
+        } else {
+            Err("Model is not initialized.".to_string())
+        }
+    })
+}
+
+
+/*
+        let result = model.run(tvec!(input_tensor.into()))
+            .map_err(|e| e.to_string())?; // Handle the error properly
+
+        if let Some(first_tensor) = result.first() {
+            let shape = first_tensor.shape().to_vec(); // Get the shape of the tensor
+            match first_tensor.to_array_view::<f32>() {
+                Ok(values) => Ok((values.as_slice().unwrap_or(&[]).to_vec(), shape)),
+                Err(_) => Err("Failed to convert tensor to array view".to_string()),
+            }
+        } else {
+            Err("No Data in Result".to_string())
+        }
+*/

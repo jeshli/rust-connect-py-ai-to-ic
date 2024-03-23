@@ -1100,6 +1100,7 @@ dependencies = [
 [[package]]
 name = "tract-core"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "anyhow",
  "bit-set",
@@ -1117,6 +1118,7 @@ dependencies = [
 [[package]]
 name = "tract-data"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "anyhow",
  "half",
@@ -1135,6 +1137,7 @@ dependencies = [
 [[package]]
 name = "tract-hir"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "derive-new",
  "log",
@@ -1144,6 +1147,7 @@ dependencies = [
 [[package]]
 name = "tract-linalg"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "derive-new",
  "downcast-rs",
@@ -1157,6 +1161,7 @@ dependencies = [
 [[package]]
 name = "tract-nnef"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "byteorder",
  "log",
@@ -1168,6 +1173,7 @@ dependencies = [
 [[package]]
 name = "tract-onnx"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "bytes",
  "derive-new",
@@ -1181,6 +1187,7 @@ dependencies = [
 [[package]]
 name = "tract-onnx-opl"
 version = "0.20.22-pre"
+source = "git+https://github.com/jeshli/tract-ic-ai.git?branch=main#5f95a5fbcc5be873a623f872814f18da8bffdd04"
 dependencies = [
  "log",
  "tract-nnef",
