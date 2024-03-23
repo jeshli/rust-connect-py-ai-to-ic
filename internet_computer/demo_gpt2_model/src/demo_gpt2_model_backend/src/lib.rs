@@ -7,13 +7,14 @@ use tract_onnx::prelude::IntoTensor;
 use tract_onnx::prelude::InferenceModelExt;
 
 
-
+/*
 #[ic_cdk::query]
-fn get_canister_id() {
+fn get_canister_id() -> String{
     let canister_name = ic_cdk::api::id();
     ic_cdk::println!("Created canister {}", canister_name);
+    canister_name
 }
-
+*/
 
 type SimplePlanTypeRead = tract_core::model::graph::Graph<
     tract_hir::infer::fact::InferenceFact,
@@ -177,7 +178,8 @@ Canister Queries
 
 
 
-#[ic_cdk::query(composite = true)]
+//#[ic_cdk::query(composite = true)]
+#[ic_cdk::update]
 async fn word_embeddings(input_text: String) -> Vec<f32> {
 
     // Trim, remove brackets, split by comma, and parse each number
@@ -248,7 +250,8 @@ async fn run_model_and_get_result_chain(token_ids: Vec<i64>) -> Vec<f32> {
 
 
 
-#[ic_cdk::query]
+//#[ic_cdk::query]
+#[ic_cdk::update]
 fn sub_nn_compute_i64(index: u8, input: Vec<i64>, input_shape: Vec<usize>) -> (Vec<f32>, Vec<usize>) {
 
     let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, input) {
@@ -260,7 +263,8 @@ fn sub_nn_compute_i64(index: u8, input: Vec<i64>, input_shape: Vec<usize>) -> (V
 
 }
 
-#[ic_cdk::query]
+//#[ic_cdk::query]
+#[ic_cdk::update]
 fn sub_nn_compute_f32(index: u8, input: Vec<f32>, input_shape: Vec<usize>) -> (Vec<f32>, Vec<usize>) {
 
     let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, input) {
