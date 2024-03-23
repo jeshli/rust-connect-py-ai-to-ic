@@ -8,13 +8,6 @@ use tract_onnx::prelude::InferenceModelExt;
 
 
 
-#[ic_cdk::query]
-fn get_canister_id() {
-    let canister_name = ic_cdk::api::id();
-    ic_cdk::println!("Created canister {}", canister_name);
-}
-
-
 type SimplePlanTypeRead = tract_core::model::graph::Graph<
     tract_hir::infer::fact::InferenceFact,
     std::boxed::Box<
@@ -174,10 +167,7 @@ Canister Queries
 
 
 
-
-
-
-#[ic_cdk::query(composite = true)]
+#[ic_cdk::query]
 async fn word_embeddings(input_text: String) -> Vec<f32> {
 
     // Trim, remove brackets, split by comma, and parse each number
@@ -199,98 +189,55 @@ async fn word_embeddings(input_text: String) -> Vec<f32> {
         },
     };
 
-    let output:Vec<f32> = run_model_and_get_result_chain(numbers).await;
+    let output: Vec<f32> = match run_model_and_get_result_chain(numbers) {
+    Ok(result) => result,
+    Err(e) => {
+        ic_cdk::println!("Failed: {}", e);
+        vec![-1.0] // Return a default vector as specified
+    }
+    };
+
     output
 
 }
 
 
-async fn run_model_and_get_result_chain(token_ids: Vec<i64>) -> Vec<f32> {
+fn run_model_and_get_result_chain(token_ids: Vec<i64>) -> Result<Vec<f32>, String> {
     let input_shape = vec![1, token_ids.len()];
-    //let shape: Vec<u64> = input_shape.into_iter().map(|dim| dim as u64).collect();
-    //let (mut out, mut result_shape) = sub_nn_compute_i64(0, token_ids, input_shape);
-    //let zero_nat8 = 0_u8;
 
-    let (mut out, mut result_shape) = match ic_cdk::call(ic_cdk::api::id(), "sub_nn_compute_i64", (0_u8, token_ids, input_shape)).await {
-        Ok(r) => {
-            let (iner_out, iner_result_shape): (Vec<f32>, Vec<usize>) = r;
-            (iner_out, iner_result_shape)
-        },
-        Err(e) => {
-            ic_cdk::println!("Call to sub_nn_compute_i64 failed: {:?}", e);
-            (vec![69.0,42.0], vec![1,1,2])
-        }
+    let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, token_ids) {
+        Ok(array) => array.into_tensor(),
+        Err(_) => return Err("Failed to create tensor from shape and values".into()),
     };
 
-    let num_models = MODEL_PIPELINE.with(|pipeline_ref| {
-        pipeline_ref.borrow().as_ref().map_or(0, |pipeline| pipeline.models.len())
-    });
-
-    for index in 1..num_models as u8 {
-        // Temporarily move out and result_shape to call_result
-        let call_result = ic_cdk::call(ic_cdk::api::id(), "sub_nn_compute_f32", (index, std::mem::take(&mut out), std::mem::take(&mut result_shape))).await;
-
-        match call_result {
-            Ok(r) => {
-                let (iner_out, iner_result_shape): (Vec<f32>, Vec<usize>) = r;
-                out = iner_out;
-                result_shape = iner_result_shape;
-            },
-            Err(e) => {
-                ic_cdk::println!("Call to sub_nn_compute_f32 failed: {:?}", e);
-                break;
-            }
-        };
+    // Use a match statement to handle the Result from run_model
+    match run_model(0_u8, input_tensor) {
+        Ok((out, _result_shape)) => Ok(out),
+        Err(e) => {
+            // Print the error and possibly return or handle it
+            println!("Error encountered: {}", e);
+            // You can decide to return the error or handle it differently
+            Err(e)
+        }
     }
 
-    out
 }
 
-
-
-#[ic_cdk::query]
-fn sub_nn_compute_i64(index: u8, input: Vec<i64>, input_shape: Vec<usize>) -> (Vec<f32>, Vec<usize>) {
-
-    let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, input) {
-        Ok(array) => array.into_tensor(),
-        Err(_) => Tensor::default(), // or handle error appropriately
-    };
-
-    run_model(index, input_tensor)
-
-}
-
-#[ic_cdk::query]
-fn sub_nn_compute_f32(index: u8, input: Vec<f32>, input_shape: Vec<usize>) -> (Vec<f32>, Vec<usize>) {
-
-    let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, input) {
-        Ok(array) => array.into_tensor(),
-        Err(_) => Tensor::default(), // or handle error appropriately
-    };
-
-    run_model(index, input_tensor)
-}
-
-
-
-
-
-fn run_model(index: u8, input: Tensor) -> (Vec<f32>, Vec<usize>) {
-
+fn run_model(index: u8, input: Tensor) -> Result<(Vec<f32>, Vec<usize>), String> {
     MODEL_PIPELINE.with(|pipeline_ref| {
         let pipeline = pipeline_ref.borrow();
         if let Some(model_pipeline) = &*pipeline {
             match model_pipeline.run_model_at_index(index, input) {
-                Ok(result_tensor) => result_tensor, // directly use the result_tensor
-                Err(_) => (vec![99.0, 100.0], vec![1, 2, 1]), // Return an error vector on failure to calculate
+                Ok(result_tensor) => Ok(result_tensor), // Return Ok variant wrapping the successful result
+                Err(e) => Err(format!("Model computation failed: {:?}", e)), // Return an Err variant with an error message
             }
         } else {
-            // You need to return something if the model pipeline is not initialized
-            (vec![6.0, 6.0, 6.0], vec![1, 1, 3]) // or handle this case as appropriate
+            // Return an Err variant if the model pipeline is not initialized
+            Err("Model pipeline is not initialized.".to_string())
         }
     })
-
 }
+
 
 
 

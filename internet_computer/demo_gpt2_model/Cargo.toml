@@ -2,3 +2,4 @@
 members = [
     "src/demo_gpt2_model_backend",
 ]
+resolver = "2"
