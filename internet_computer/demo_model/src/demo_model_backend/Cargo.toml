@@ -1,5 +1,5 @@
 [package]
-name = "demo_gpt2_model_backend"
+name = "demo_model_backend"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,9 +9,9 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-#candid = "0.8"
-ic-cdk = "0.12"
-#ic-cdk-timers = "0.1" # Feel free to remove this dependency if you don't need timers
+candid = "0.10"
+ic-cdk = "0.13"
+ic-cdk-timers = "0.7" # Feel free to remove this dependency if you don't need timers
 tract-onnx = { git = "https://github.com/jeshli/tract-ic-ai.git", branch = "main", package = "tract-onnx" }
 tract-core = { git = "https://github.com/jeshli/tract-ic-ai.git", branch = "main", package = "tract-core" }
 tract-hir = { git = "https://github.com/jeshli/tract-ic-ai.git", branch = "main", package = "tract-hir" }
@@ -22,6 +22,9 @@ tract-data = { git = "https://github.com/jeshli/tract-ic-ai.git", branch = "main
 #tract-data = { path = "../../../../../tract-ic-ai/data" , default-features = false}
 bytes = { version = "1.0.1", default-features = false }
 #getrandom = { version = "0.2.6", features = ["js"]}
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
 opt-level = 'z'  # Optimize for size
