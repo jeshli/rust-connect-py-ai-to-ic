@@ -61,8 +61,9 @@ fn main() -> Result<(), String> {
 
         //simple_dfx_execute(canister_name, "model_bytes_to_plan");
         //simple_dfx_execute(canister_name, "plan_to_running_model");
-        simple_dfx_execute(canister_name, "model_bytes_to_plan", network_type);
-        simple_dfx_execute(canister_name, "plan_to_running_model", network_type);
+        // pausing automatic writing of model
+        //simple_dfx_execute(canister_name, "model_bytes_to_plan", network_type);
+        //simple_dfx_execute(canister_name, "plan_to_running_model", network_type);
     }
 
     // loop through the models
@@ -85,7 +86,7 @@ pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str){
 */
 
 pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str, network: Option<&str>){
-    let output = dfx(
+    let _output = dfx(
         "canister",
         "call",
         &vec![

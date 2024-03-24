@@ -41,6 +41,12 @@ thread_local! {
 Uploading and Initializing Model
 #############################
 */
+#[ic_cdk::update]
+fn clear_wasm_ref_cell() {
+    WASM_REF_CELL.with(|wasm_ref_cell| {
+        wasm_ref_cell.borrow_mut().clear();
+    });
+}
 
 #[ic_cdk::update]
 pub fn upload_model_chunks(bytes: Vec<u8>) { // -> Result<(), String>
@@ -149,6 +155,7 @@ async fn word_embeddings(input_text: String) -> Vec<f32> {
 
 fn create_tensor_and_run_model(token_ids: Vec<i64>) -> Result<Vec<f32>, String> {
     let input_shape = vec![1, token_ids.len()];
+    //let input_shape = vec![token_ids.len()];
 
     let input_tensor = match tract_ndarray::Array::from_shape_vec(input_shape, token_ids) {
         Ok(array) => array.into_tensor(),
