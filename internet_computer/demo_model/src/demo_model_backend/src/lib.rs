@@ -34,6 +34,24 @@ thread_local! {
 
 }
 
+// ##### Handle WASM_REF_CELL ########
+
+#[ic_cdk::query]
+fn wasm_ref_cell_length() -> usize {
+    WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().len())
+}
+
+#[ic_cdk::update]
+fn clear_wasm_ref_cell() {
+    WASM_REF_CELL.with(|wasm_ref_cell| {
+        wasm_ref_cell.borrow_mut().clear();
+    });
+}
+
+#[ic_cdk::update]
+fn pop_last_from_wasm_ref_cell() {
+    WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow_mut().pop());
+}
 
 
 /*
@@ -41,12 +59,7 @@ thread_local! {
 Uploading and Initializing Model
 #############################
 */
-#[ic_cdk::update]
-fn clear_wasm_ref_cell() {
-    WASM_REF_CELL.with(|wasm_ref_cell| {
-        wasm_ref_cell.borrow_mut().clear();
-    });
-}
+
 
 #[ic_cdk::update]
 pub fn upload_model_chunks(bytes: Vec<u8>) { // -> Result<(), String>

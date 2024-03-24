@@ -17,8 +17,8 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
 
     // Ensure there are enough arguments
-    if args.len() < 5 {
-        return Err("Not enough arguments. Usage: <program> <canister_name> <canister_method_name> <model_folder_path> <models_list> [network_type]".to_string());
+    if args.len() < 6 {
+        return Err("Not enough arguments. Usage: <program> <canister_name> <canister_method_name> <model_folder_path> <models_list> <start_ind> [network_type]".to_string());
     }
 
     //let program = &args[0];                                        //         ../../rust/upload_byte_file/Cargo.toml
@@ -28,9 +28,11 @@ fn main() -> Result<(), String> {
     //let model_files: Vec<&str> = args[4].split(',').collect();  //          <gpt2_embedding.onnx,gpt2_layer_0.onnx>
     let model_files_input = args[4].trim_matches(|c| c == '[' || c == ']');
     let model_files: Vec<&str> = model_files_input.split(',').collect();
+    let start_ind: usize = args[5].parse().map_err(|_| "Failed to parse start_ind as integer")?;
+
 
     // Optional network type argument
-    let network_type = args.get(5).map(String::as_str); // This returns Option<&str>
+    let network_type = args.get(6).map(String::as_str); // This returns Option<&str>
 
     //println!("Hello, world!");
     //simple_dfx_execute(canister_name, "initialize_model_pipeline");
@@ -45,7 +47,7 @@ fn main() -> Result<(), String> {
         let model_data = fs::read(&model_path)
             .map_err(|e| e.to_string())?;
 
-        let model_chunks = split_into_chunks(model_data, MAX_CANISTER_HTTP_PAYLOAD_SIZE);
+        let model_chunks = split_into_chunks(model_data, MAX_CANISTER_HTTP_PAYLOAD_SIZE, start_ind);
 
         for (index, model_chunk) in model_chunks.iter().enumerate() {
             upload_chunk(
@@ -97,11 +99,12 @@ pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str, netwo
     ).expect("Simple DFX Command Failed");
 }
 
-pub fn split_into_chunks(data: Vec<u8>, chunk_size: usize) -> Vec<Vec<u8>> {
+pub fn split_into_chunks(data: Vec<u8>, chunk_size: usize, start_ind: usize) -> Vec<Vec<u8>> {
     let mut chunks = Vec::new();
-    let mut start = 0;
+    //let mut start = 0;
+    let mut start = start_ind;
     let data_len = data.len();
-
+    println!("Data Length {}", data_len);
     while start < data_len {
         let end = usize::min(start + chunk_size, data_len);
         chunks.push(data[start..end].to_vec());
