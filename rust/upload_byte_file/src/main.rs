@@ -18,7 +18,7 @@ fn main() -> Result<(), String> {
 
     // Ensure there are enough arguments
     if args.len() < 5 {
-        return Err("Not enough arguments. Usage: <program> <canister_name> <canister_method_name> <model_folder_path> <models_list>".to_string());
+        return Err("Not enough arguments. Usage: <program> <canister_name> <canister_method_name> <model_folder_path> <models_list> [network_type]".to_string());
     }
 
     //let program = &args[0];                                        //         ../../rust/upload_byte_file/Cargo.toml
@@ -28,6 +28,9 @@ fn main() -> Result<(), String> {
     //let model_files: Vec<&str> = args[4].split(',').collect();  //          <gpt2_embedding.onnx,gpt2_layer_0.onnx>
     let model_files_input = args[4].trim_matches(|c| c == '[' || c == ']');
     let model_files: Vec<&str> = model_files_input.split(',').collect();
+
+    // Optional network type argument
+    let network_type = args.get(5).map(String::as_str); // This returns Option<&str>
 
     //println!("Hello, world!");
     //simple_dfx_execute(canister_name, "initialize_model_pipeline");
@@ -52,11 +55,14 @@ fn main() -> Result<(), String> {
                 canister_method_name,
                 index,
                 model_chunks.len(),
+                network_type
             )?;
         }
 
-        simple_dfx_execute(canister_name, "model_bytes_to_plan");
-        simple_dfx_execute(canister_name, "plan_to_running_model");
+        //simple_dfx_execute(canister_name, "model_bytes_to_plan");
+        //simple_dfx_execute(canister_name, "plan_to_running_model");
+        simple_dfx_execute(canister_name, "model_bytes_to_plan", network_type);
+        simple_dfx_execute(canister_name, "plan_to_running_model", network_type);
     }
 
     // loop through the models
@@ -64,6 +70,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
+/*
 //pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str) -> Result<(), String> {
 pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str){
     let output = dfx(
@@ -75,7 +82,19 @@ pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str){
         ],
     ).expect("Simple DFX Command Failed");
 }
+*/
 
+pub fn simple_dfx_execute(canister_name: &str, canister_method_name: &str, network: Option<&str>){
+    let output = dfx(
+        "canister",
+        "call",
+        &vec![
+            canister_name,
+            canister_method_name,
+        ],
+        network, // Pass the optional network argument
+    ).expect("Simple DFX Command Failed");
+}
 
 pub fn split_into_chunks(data: Vec<u8>, chunk_size: usize) -> Vec<Vec<u8>> {
     let mut chunks = Vec::new();
@@ -107,7 +126,8 @@ pub fn upload_chunk(name: &str,
     bytecode_chunk: &Vec<u8>,
     canister_method_name: &str,
     chunk_number: usize,
-    chunk_total: usize) -> Result<(), String> {
+    chunk_total: usize,
+    network: Option<&str>) -> Result<(), String> {
 
     let blob_string = vec_u8_to_blob_string(bytecode_chunk);
 
@@ -141,6 +161,7 @@ pub fn upload_chunk(name: &str,
             ))?,
             //&file_contents
         ],
+        network, // Pass the optional network argument
     )?;
 
     let chunk_number = chunk_number + 1;
@@ -159,7 +180,7 @@ pub fn upload_chunk(name: &str,
     Ok(())
 }
 
-
+/*
 pub fn dfx(command: &str, subcommand: &str, args: &Vec<&str>) -> Result<std::process::Output, String> {
 
     //let dfx_network = std::env::var("DFX_NETWORK")
@@ -175,7 +196,25 @@ pub fn dfx(command: &str, subcommand: &str, args: &Vec<&str>) -> Result<std::pro
 
     dfx_command.output().map_err(|e| e.to_string())
 }
+*/
 
+pub fn dfx(command: &str, subcommand: &str, args: &Vec<&str>, network: Option<&str>) -> Result<std::process::Output, String> {
+    let mut dfx_command = Command::new("dfx");
+    dfx_command.arg(command);
+    dfx_command.arg(subcommand);
+
+    // Check if the network argument is provided and add it to the command if present
+    if let Some(net) = network {
+        dfx_command.arg("--network");
+        dfx_command.arg(net);
+    }
+
+    for arg in args {
+        dfx_command.arg(arg);
+    }
+
+    dfx_command.output().map_err(|e| e.to_string())
+}
 
 
 pub fn error_to_string(e: &dyn std::error::Error) -> String {
