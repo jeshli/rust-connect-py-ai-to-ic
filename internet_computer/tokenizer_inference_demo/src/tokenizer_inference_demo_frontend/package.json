@@ -27,7 +27,7 @@
     "build": "tsc && vite build",
     "format": "prettier --write \"src/**/*.{json,js,jsx,ts,tsx,css,scss}\"",
     "prebuild": "dfx generate",
-    "setup": "npm i && dfx canister create tokenizer_inference_demo_backend && dfx generate tokenizer_inference_demo_backend && dfx deploy",
+    "setup": "npm i && dfx canister create tokenizer_inference_demo_backend && dfx generate inference_backend && dfx generate tokenizer_backend && dfx deploy",
     "start": "vite --port 3000",
     "test": "vitest run"
   },

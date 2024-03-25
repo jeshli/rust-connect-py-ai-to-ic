@@ -1,31 +1,46 @@
 import { useState } from 'react';
-import { tokenizer_inference_demo_backend } from 'declarations/tokenizer_inference_demo_backend';
+import { tokenizer_backend } from 'declarations/tokenizer_backend';
+import { inference_backend } from 'declarations/inference_backend';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [tokenIds, setTokenIds] = useState([]);
 
   function handleSubmit(event) {
     event.preventDefault();
-    const name = event.target.elements.name.value;
-    tokenizer_inference_demo_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
+    const text = event.target.elements.text.value;
+    tokenizer_backend.tokenize_text(text)
+      .then((tokens) => {
+        setTokenIds(tokens);
+      })
+      .catch(error => {
+        console.error("Error during tokenization:", error);
+        setTokenIds([]);
+      });
     return false;
   }
 
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
+    <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src="/logo2.svg" alt="DFINITY logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginRight: '20px' }} />
+        <img src="/Mod_Club.png" alt="ModClub logo" style={{ height: '100px', width: 'auto', objectFit: 'contain' }} />
+      </div>
+      <br /><br />
       <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
+        <label htmlFor="text">Enter text: &nbsp;</label>
+        <input id="text" type="text" />
+        <button type="submit">Tokenize Text</button>
       </form>
-      <section id="greeting">{greeting}</section>
+      <section id="tokens">
+        {tokenIds.length > 0 ? (
+          <p>Token IDs: {tokenIds.join(', ')}</p>
+        ) : (
+          <p>No tokens to display.</p>
+        )}
+      </section>
     </main>
   );
 }
+
 
 export default App;
