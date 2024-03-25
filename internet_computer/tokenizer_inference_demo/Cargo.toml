@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "src/tokenizer_inference_demo_backend",
+    "src/tokenizer_backend"
+]
+resolver = "2"

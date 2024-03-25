@@ -1,0 +1,5 @@
+service : {
+    "upload_data_chunks" : (vec nat8) -> ();
+    "clear_wasm_ref_cell": () -> ();
+    "wasm_ref_cell_length": () -> (nat64) query;
+}

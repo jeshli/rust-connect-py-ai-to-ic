@@ -1,0 +1,44 @@
+{
+  "canisters": {
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    },
+    "tokenizer_inference_demo_backend": {
+      "candid": "src/tokenizer_inference_demo_backend/tokenizer_inference_demo_backend.did",
+      "package": "tokenizer_inference_demo_backend",
+      "type": "rust"
+    },
+    "tokenizer_backend": {
+      "candid": "src/tokenizer_backend/tokenizer_backend.did",
+      "package": "tokenizer_backend",
+      "type": "rust"
+    },
+    "tokenizer_inference_demo_frontend": {
+      "dependencies": [
+        "tokenizer_inference_demo_backend",
+        "tokenizer_backend"
+      ],
+      "source": [
+        "src/tokenizer_inference_demo_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "tokenizer_inference_demo_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
