@@ -2,4 +2,8 @@ service : {
     "upload_data_chunks" : (vec nat8) -> ();
     "clear_wasm_ref_cell": () -> ();
     "wasm_ref_cell_length": () -> (nat64) query;
+    "bytes_to_vocab": () -> (text);
+    "bytes_to_merges": () -> (text);
+    "initialize_tokenizer": () -> (text);
+    "tokenize_text": (text) -> (vec nat64) query;
 }

@@ -2,7 +2,7 @@ use std::cell::RefCell;
 
 
 thread_local! {
-    static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
+    pub static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
 }
 
 #[ic_cdk::query]
