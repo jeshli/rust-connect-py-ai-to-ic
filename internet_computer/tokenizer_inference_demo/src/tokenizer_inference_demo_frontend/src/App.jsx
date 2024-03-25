@@ -12,21 +12,18 @@ function App() {
     tokenizer_backend.tokenize_text(text)
       .then((tokens) => {
         setTokenIds(tokens);
+        return inference_backend.model_inference(tokens);
       })
       .catch(error => {
         console.error("Error during tokenization:", error);
         setTokenIds([]);
-      });
-    // may need some sort of wait before calling model_inference
-    inference_backend.model_inference(tokens)
-      .then((scores) => {
+      }).then((scores) => {
         setInferenceResults(scores);
       })
       .catch(error => {
         console.error("Error during inference:", error);
         setInferenceResults([]);
       });
-
 
     return false;
   }
