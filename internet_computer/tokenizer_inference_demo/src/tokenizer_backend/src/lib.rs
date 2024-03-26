@@ -133,18 +133,26 @@ pub fn tokenize_text(text: &str) -> Result<Vec<i64>> {
 */
 
 #[ic_cdk::query]
-pub fn tokenize_text(text: String) -> Vec<i64> {
+pub fn tokenize_text(text: String) -> (Vec<i64>, Vec<String>) {
     // Attempt to borrow the tokenizer from the RefCell
     TOKENIZER.with(|tokenizer_ref_cell| {
         // Here, we check if the tokenizer is initialized and borrow it
         if let Some(tokenizer) = tokenizer_ref_cell.borrow().as_ref() {
             // If the tokenizer is initialized, proceed with tokenization
             let tokenized_input = tokenizer.encode(&text, None, 128, &TruncationStrategy::LongestFirst, 0);
-            tokenized_input.token_ids.clone()
+            let token_ids = tokenized_input.token_ids.clone();
+            //ic_cdk::println!("{}", tokenized_input);
+
+            let tokens_list = tokenizer.decode_to_vec(&token_ids, true);
+            let tokens_cleaned = tokens_list.iter().map(|t| t.replace("Ġ", " ")).collect();  // Replace `Ġ` with space
+            //ic_cdk::println!("{}", tokens_list);
+            // Assume `.tokens` is the field that gives you the string representations
+            //let tokens = tokenized_input.tokens.clone(); // This line is hypothetical and depends on your tokenizer's API
+            //let tokens_list = vec![];
+            (token_ids, tokens_cleaned)
         } else {
             // If the tokenizer is not initialized, return a default value
-            // This could also be an empty vector if you prefer: vec![]
-            vec![-1]
+            (vec![], vec![])
         }
     })
 }

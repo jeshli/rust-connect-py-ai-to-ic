@@ -2,21 +2,33 @@ import { useState } from 'react';
 import { tokenizer_backend } from 'declarations/tokenizer_backend';
 import { inference_backend } from 'declarations/inference_backend';
 
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 function App() {
   const [tokenIds, setTokenIds] = useState([]);
+  const [tokenValues, setTokenValues] = useState([]);
   const [inferenceResults, setInferenceResults] = useState([]);
 
   function handleSubmit(event) {
     event.preventDefault();
     const text = event.target.elements.text.value;
     tokenizer_backend.tokenize_text(text)
-      .then((tokens) => {
-        setTokenIds(tokens);
-        return inference_backend.model_inference(tokens);
+      .then(([token_ids, token_values]) => {
+        setTokenIds(token_ids);
+        setTokenValues(token_values);
+        return inference_backend.model_inference(token_ids);
       })
       .catch(error => {
         console.error("Error during tokenization:", error);
         setTokenIds([]);
+        setTokenValues([]);
       }).then((scores) => {
         setInferenceResults(scores);
       })
@@ -41,8 +53,18 @@ function App() {
         <button type="submit">Tokenize Text</button>
       </form>
       <section id="tokens">
-        {tokenIds.length > 0 ? (
-          <p>Token IDs: {tokenIds.join(', ')}</p>
+        {tokenValues.length > 0 ? (
+          <p>Tokens:&nbsp;
+            {tokenValues.map((token, index) => (
+              <span key={index} style={{
+                backgroundColor: getRandomColor(),
+                margin: '0', // Removed space between spans
+                padding: '0'  // Adjust according to preference
+              }}>
+                {token}
+              </span>
+            ))}
+          </p>
         ) : (
           <p>No tokens to display.</p>
         )}

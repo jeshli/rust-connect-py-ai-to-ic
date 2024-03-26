@@ -5,5 +5,5 @@ service : {
     "bytes_to_vocab": () -> (text);
     "bytes_to_merges": () -> (text);
     "initialize_tokenizer": () -> (text);
-    "tokenize_text": (text) -> (vec nat64) query;
+    "tokenize_text": (text) -> (vec nat64, vec text) query;
 }
