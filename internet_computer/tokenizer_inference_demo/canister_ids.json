@@ -1,0 +1,11 @@
+{
+  "inference_backend": {
+    "ic": "hbd75-hqaaa-aaaao-a3ksa-cai"
+  },
+  "tokenizer_backend": {
+    "ic": "hgczj-kiaaa-aaaao-a3ksq-cai"
+  },
+  "tokenizer_inference_demo_frontend": {
+    "ic": "hpbsv-4aaaa-aaaao-a3kta-cai"
+  }
+}
