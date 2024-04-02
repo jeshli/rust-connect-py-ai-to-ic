@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { tokenizer_backend } from 'declarations/tokenizer_backend';
 import { inference_backend } from 'declarations/inference_backend';
 
@@ -39,6 +39,8 @@ function App() {
 
     return false;
   }
+  // Calculate the sum of inference results
+  const totalScore = useMemo(() => inferenceResults.reduce((acc, curr) => acc + curr, 0), [inferenceResults]);
 
   return (
     <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
@@ -50,7 +52,7 @@ function App() {
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="text">Enter text: &nbsp;</label>
         <input id="text" type="text" />
-        <button type="submit">Tokenize Text</button>
+        <button type="submit">Tokenize and Evaluate Text</button>
       </form>
       <section id="tokens">
         {tokenValues.length > 0 ? (
@@ -75,6 +77,9 @@ function App() {
         ) : (
           <p>No score to display.</p>
         )}
+      </section>
+      <section>
+        <p>Total Score: {totalScore.toFixed(2)}</p>
       </section>
     </main>
   );
