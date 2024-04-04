@@ -2,19 +2,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { tokenizer_backend } from 'declarations/tokenizer_backend';
 import { inference_backend } from 'declarations/inference_backend';
 
-function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
+
 
 function App() {
   const [tokenIds, setTokenIds] = useState([]);
   const [tokenValues, setTokenValues] = useState([]);
   const [inferenceResults, setInferenceResults] = useState([]);
+  const [inferenceResultWeights, setInferenceResultWeights] = useState([]);
   const [inferenceExpResults, setInferenceExpResults] = useState([]);
   const [bias, setBias] = useState(-3); // Default bias value set to 2
   const [scale, setScale] = useState(8); // Default bias value set to 2
@@ -37,6 +31,8 @@ function App() {
         //const transformedScores = scores.map(score => Math.exp(scale * (score + bias)) );
         const transformedScores = scores.map(score => Math.exp(scale * score + bias) );
         setInferenceExpResults(transformedScores);
+        const scoreWeights = scores.map(score => Math.max(Math.exp(score),1) + 1 );
+        setInferenceResultWeights(scoreWeights);
       })
       .catch(error => {
         console.error("Error during inference:", error);
@@ -46,8 +42,19 @@ function App() {
 
     return false;
   }
+
+
   // Calculate the sum of inference results
-  const totalScore = useMemo(() => inferenceResults.reduce((acc, curr) => acc + curr, 0), [inferenceResults]);
+  const totalScore = useMemo(() => {
+      // Ensure that inferenceResults and inferenceResultWeights are defined and have the same length
+      if (!inferenceResults || !inferenceResultWeights || inferenceResults.length !== inferenceResultWeights.length) {
+        console.error('inferenceResults and inferenceResultWeights must be defined and have the same length.');
+        return 0;
+      }
+
+      // Calculate the weighted sum
+      return inferenceResults.reduce((acc, curr, index) => acc + curr * inferenceResultWeights[index], 0);
+  }, [inferenceResults, inferenceResultWeights]); // Recalculate if either array changes
 
   useEffect(() => {
     //const transformedScores = inferenceResults.map(score => Math.exp(scale * (score + bias)));
@@ -62,6 +69,7 @@ function App() {
         <img src="/DecideAI.png" alt="DecideAI logo" style={{ height: '100px', width: 'auto', objectFit: 'contain' }} />
       </div>
       <br /><br />
+      <h2>Redactor v0.1</h2>
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="text">Enter text: &nbsp;</label>
         <input id="text" type="text" />
@@ -85,6 +93,10 @@ function App() {
           <p>No tokens to display.</p>
         )}
 
+        <p>Total Score: {totalScore.toFixed(2)}</p>
+      </section>
+      <section class="customize-section">
+        <p>Customize your app or let users personalize their settings.</p>
         <div>
           <label htmlFor="biasSlider">Adjust Bias: </label>
           <input
@@ -123,10 +135,27 @@ function App() {
         )}
       </section>
       */}
-      <section>
-        <p>Total Score: {totalScore.toFixed(2)}</p>
+      <section class="note">
+        <br /><br />
+        <p>This is a secure, permanent, trustless, and free API.</p>
       </section>
 
+      <section class="api-section">
+        <div class="api-container">
+            <h3>Tokenization</h3>
+            <div class="api-details">
+                <p><strong>Canister:</strong>hgczj-kiaaa-aaaao-a3ksq-cai</p>
+                <p><strong>Query:</strong> tokenize_text: (text) → (vec nat64, vec text) query</p>
+            </div>
+        </div>
+        <div class="api-container">
+            <h3>Inference</h3>
+            <div class="api-details">
+                <p><strong>Canister:</strong>hbd75-hqaaa-aaaao-a3ksa-cai</p>
+                <p><strong>Query:</strong> model_inference: (vec int64) → (vec float32) query</p>
+            </div>
+        </div>
+      </section>
 
 
     </main>

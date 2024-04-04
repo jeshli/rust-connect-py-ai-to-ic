@@ -26,12 +26,70 @@ button[type="submit"] {
   float: right;
 }
 
-#greeting {
-  margin: 10px auto;
-  padding: 10px 60px;
-  border: 1px solid #222;
+
+.api-section {
+    display: flex;
+    justify-content: space-around; /* Adjust this to center if it looks better in your layout */
+    flex-wrap: wrap; /* Allows items to wrap in smaller viewports */
+    padding: 20px;
 }
 
-#greeting:empty {
-  display: none;
+.api-container {
+    flex-basis: 45%; /* Adjusts the base size of each container before filling the row */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 2px;
+    padding: 10px;
+    margin: 10px;
+    background-color: #f9f9f9;
+}
+
+.api-details p {
+    margin: 10px 0;
+    font-size: 12px; /* Smaller text for details */
+
+}
+
+.customize-section p {
+    margin: 10px 0;
+    font-size: 14px; /* Smaller text for details */
+
+}
+.customize-section label {
+    margin: 10px 0;
+    font-size: 16px; /* Smaller text for details */
+
+}
+.customize-section span {
+    margin: 10px 0;
+    font-size: 16px; /* Smaller text for details */
+
+}
+
+
+h2 {
+    text-align: center;
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    -webkit-background-clip: text;
+    color: transparent;
+    background-clip: text;
+    display: inline-block; /* Ensure the gradient spans the text only */
+}
+
+
+/* For paragraphs within .api-details */
+.api-section .api-details p {
+}
+
+/* For headings */
+.api-section h3 {
+    font-size: 14px; /* Smaller headings, adjust as needed */
+}
+.note p {
+    font-size: 14px; /* Smaller headings, adjust as needed */
+}
+
+
+/* For the introductory div text */
+.api-section > div:first-child {
+    font-size: 14px; /* Adjust the font size of the first div's text */
 }
