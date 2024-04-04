@@ -10,8 +10,8 @@ function App() {
   const [inferenceResults, setInferenceResults] = useState([]);
   const [inferenceResultWeights, setInferenceResultWeights] = useState([]);
   const [inferenceExpResults, setInferenceExpResults] = useState([]);
-  const [bias, setBias] = useState(-3); // Default bias value set to 2
-  const [scale, setScale] = useState(8); // Default bias value set to 2
+  const [bias, setBias] = useState(0); // Default bias value set to 2
+  const [scale, setScale] = useState(15); // Default bias value set to 2
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -102,11 +102,11 @@ function App() {
           <input
             id="biasSlider"
             type="range"
-            min="-5" // Minimum value of bias
-            max="5" // Maximum value of bias
+            min="-2" // Minimum value of bias
+            max="2" // Maximum value of bias
             value={bias}
             onChange={(e) => setBias(Number(e.target.value))}
-            step="0.01" // Adjust for finer control
+            step="0.1" // Adjust for finer control
           />
           <span>{bias}</span> {/* Display the current bias value */}
         </div>
@@ -116,11 +116,11 @@ function App() {
           <input
             id="scaleSlider"
             type="range"
-            min="5" // Minimum value of bias
-            max="15" // Maximum value of bias
+            min="10" // Minimum value of bias
+            max="20" // Maximum value of bias
             value={scale}
             onChange={(e) => setScale(Number(e.target.value))}
-            step="0.01" // Adjust for finer control
+            step="0.1" // Adjust for finer control
           />
           <span>{scale}</span> {/* Display the current bias value */}
         </div>
