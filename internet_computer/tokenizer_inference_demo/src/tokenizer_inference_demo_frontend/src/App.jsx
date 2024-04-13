@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { tokenizer_backend } from 'declarations/tokenizer_backend';
 import { inference_backend } from 'declarations/inference_backend';
-
+import { Usergeek } from 'usergeek-ic-js';
 
 
 function App() {
@@ -13,9 +13,21 @@ function App() {
   const [bias, setBias] = useState(0); // Default bias value set to 2
   const [scale, setScale] = useState(15); // Default bias value set to 2
 
+  // Initialize Usergeek on app startup
+  useEffect(() => {
+    Usergeek.init({
+      apiKey: process.env.REACT_APP_USERGEEK_API_KEY, // Replace "YOUR_API_KEY" with your actual API key
+      host: "https://ic0.app" // This is optional and used on environments other than the IC main network
+    });
+  }, []);
+
   function handleSubmit(event) {
     event.preventDefault();
     const text = event.target.elements.text.value;
+
+    // Track the submit event
+    Usergeek.trackEvent("SubmitClicked");
+
     tokenizer_backend.tokenize_text(text)
       .then(([token_ids, token_values]) => {
         setTokenIds(token_ids);

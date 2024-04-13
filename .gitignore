@@ -35,6 +35,7 @@ dist/
 
 # environment variables
 .env
+**/.env
 
 #
 Rust/libonnxruntime/*
