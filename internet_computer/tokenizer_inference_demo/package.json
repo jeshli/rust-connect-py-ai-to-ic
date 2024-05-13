@@ -14,5 +14,12 @@
   "type": "module",
   "workspaces": [
     "src/tokenizer_inference_demo_frontend"
-  ]
+  ],
+  "dependencies": {
+    "process": "^0.11.10",
+    "usergeek-ic-js": "^1.0.5"
+  },
+  "devDependencies": {
+    "rollup-plugin-node-polyfills": "^0.2.1"
+  }
 }
